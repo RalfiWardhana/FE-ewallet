@@ -1,20 +1,40 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+
+    // Or if using `src` directory:
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      colors: {
-        purple: {
-          600: '#6B46C1',
-          700: '#553C9A',
-          800: '#44337A',
-        },
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };
+
+// bagian sini ad yg kurang tepat syntax ny
+// /** @type {import('tailwindcss').Config} */
+// module.exports = {
+//   content: [
+//     "./app//*.{js,ts,jsx,tsx,mdx}",
+//     "./pages//*.{js,ts,jsx,tsx,mdx}",
+//     "./components//*.{js,ts,jsx,tsx,mdx}",
+
+//     // Or if using src directory:
+//     "./src//*.{js,ts,jsx,tsx,mdx}",
+//   ],
+//   theme: {
+//     extend: {
+//       colors: {
+//         purple: {
+//           600: "#6B46C1",
+//           700: "#553C9A",
+//           800: "#44337A",
+//         },
+//       },
+//     },
+//   },
+//   plugins: [],
+// };
