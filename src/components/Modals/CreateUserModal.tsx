@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { X, UserPlus } from 'lucide-react';
+import { X } from 'lucide-react';
 import { userApi } from '@/lib/api';
 
 interface CreateUserModalProps {
@@ -13,9 +13,10 @@ interface CreateUserModalProps {
 
 export default function CreateUserModal({ onClose, onSuccess, standalone = false }: CreateUserModalProps) {
   const [fullName, setFullName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
 
   const createMutation = useMutation({
-    mutationFn: (data: { full_name: string }) => userApi.create(data),
+    mutationFn: (data: { full_name: string; account_number: string }) => userApi.create(data),
     onSuccess: () => {
       onSuccess();
     },
@@ -23,74 +24,78 @@ export default function CreateUserModal({ onClose, onSuccess, standalone = false
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (fullName.trim()) {
-      createMutation.mutate({ full_name: fullName });
+    if (fullName.trim() && accountNumber.trim()) {
+      createMutation.mutate({ full_name: fullName, account_number: accountNumber });
     }
   };
 
   const modalContent = (
-    <div className="bg-white rounded-lg p-6 w-full max-w-md">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Tambah User</h2>
-        <button
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <X className="w-6 h-6" />
-        </button>
+    <div className="bg-white rounded-xl w-full max-w-sm shadow-lg relative">
+      {/* Close Button */}
+      <button onClick={onClose} className="absolute top-4 right-4 text-gray-800 hover:text-gray-600">
+        <X className="w-6 h-6" />
+      </button>
+
+      {/* Header */}
+      <div className="pt-6 px-6 text-center pb-2">
+        <h2 className="text-lg font-semibold text-gray-900">Tambah User</h2>
+      </div>
+      <div className="px-6">
+        <hr className="border-t border-gray-200 mt-2 mb-2" />
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="bg-purple-50 rounded-lg p-4 mb-6 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <UserPlus className="w-8 h-8 text-purple-600" />
-            </div>
-            <p className="text-sm text-purple-700">User baru akan dibuat dengan saldo awal</p>
-            <p className="text-2xl font-bold text-purple-700 mt-1">Rp0</p>
-          </div>
-        </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Nama
-          </label>
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="px-6 pt-6 pb-6">
+        <div className="mb-4">
+          <label className="text-sm text-gray-900 font-medium block mb-2">Nama</label>
           <input
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             placeholder="Masukkan nama"
             required
           />
         </div>
 
+        <div className="mb-6">
+          <label className="text-sm text-gray-900 font-medium block mb-2">Rekening</label>
+          <input
+            type="text"
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value)}
+            className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Masukkan rekening"
+            required
+          />
+        </div>
+
+        {/* Buttons */}
         <div className="flex gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="flex-1 py-3 border border-purple-600 text-purple-600 rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors"
           >
             Batal
           </button>
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            className="flex-1 py-3 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700 disabled:opacity-50"
           >
-            {createMutation.isPending ? 'Loading...' : 'Simpan'}
+            {createMutation.isPending ? 'Menyimpan...' : 'Simpan'}
           </button>
         </div>
       </form>
     </div>
   );
 
-  if (standalone) {
-    return modalContent;
-  }
+  if (standalone) return modalContent;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
       {modalContent}
     </div>
   );
