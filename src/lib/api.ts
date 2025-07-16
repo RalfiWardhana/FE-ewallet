@@ -1,3 +1,4 @@
+// src/lib/api.ts
 import axios from 'axios';
 import { User, Transaction, TransferHistory, TopupHistory } from '@/types';
 
@@ -13,7 +14,7 @@ const api = axios.create({
 export const userApi = {
   getAll: () => api.get<User[]>('/users'),
   getOne: (id: number) => api.get<User>(`/users/${id}`),
-  create: (data: { full_name: string }) => api.post<User>('/users', data),
+  create: (data: { full_name: string; rekening: string }) => api.post<User>('/users', data),
   topup: (id: number, amount: number) => 
     api.post(`/users/${id}/topup`, { amount }),
   transfer: (id: number, to_user_id: number, amount: number) => 
@@ -26,12 +27,16 @@ export const transactionApi = {
     api.get<Transaction[]>('/transactions/balance-history', {
       params: { userId, date }
     }),
-  getTransferHistory: (userId?: number) => 
+  getTransferHistory: (userId?: number, startDate?: string, endDate?: string) => 
     api.get<TransferHistory[]>('/transactions/transfers', {
-      params: { userId }
+      params: { userId, startDate, endDate }
     }),
-  getTopupHistory: (userId?: number) => 
+  getTopupHistory: (userId?: number, startDate?: string, endDate?: string) => 
     api.get<TopupHistory[]>('/transactions/topups', {
-      params: { userId }
+      params: { userId, startDate, endDate }
+    }),
+  getByDateRange: (startDate: string, endDate: string, userId?: number) =>
+    api.get<Transaction[]>('/transactions/by-date-range', {
+      params: { startDate, endDate, userId }
     }),
 };

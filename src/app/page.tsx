@@ -91,7 +91,7 @@ export default function WalletPage() {
                 <thead>
                   <tr className="bg-gray-100 text-left">
                     <th className="py-3 px-6 text-gray-700 font-medium">Nama</th>
-                    <th className="py-3 px-6 text-gray-700 font-medium">Bank</th>
+                    <th className="py-3 px-6 text-gray-700 font-medium">Rekening</th>
                     <th className="py-3 px-6 text-gray-700 font-medium">Saldo</th>
                     <th className="py-3 px-6 text-gray-700 font-medium text-center">Aksi</th>
                   </tr>
@@ -100,17 +100,17 @@ export default function WalletPage() {
                 <tbody>
                   {isLoading ? (
                     <tr>
-                      <td colSpan={3} className="text-center py-6 text-gray-500">Loading...</td>
+                      <td colSpan={4} className="text-center py-6 text-gray-500">Loading...</td>
                     </tr>
                   ) : filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className="text-center py-6 text-gray-500">Data tidak ditemukan</td>
+                      <td colSpan={4} className="text-center py-6 text-gray-500">Data tidak ditemukan</td>
                     </tr>
                   ) : (
                     filteredUsers.map((user) => (
                       <tr key={user.id} className="border-b hover:bg-gray-50">
                         <td className="py-4 px-6">{user.full_name}</td>
-                        <td className="py-4 px-6">{user.bank_name || '-'}</td>
+                        <td className="py-4 px-6 font-mono text-sm">{user.rekening || '-'}</td>
                         <td className="py-4 px-6 font-semibold">{formatCurrency(Number(user.balance))}</td>
                         <td className="py-4 px-6 text-center relative">
                           <div className="relative inline-block text-left">
