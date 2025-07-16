@@ -39,9 +39,9 @@ export default function WalletPage() {
 
       <main className="flex-1">
         {/* HEADER UNGU */}
-        <div className="bg-purple-700 text-white py-14 relative">
-          <div className="container mx-auto px-6">
-            <h1 className="text-3xl font-bold text-center">Wallet</h1>
+        <div className="bg-[#6E32B9] text-white py-10">
+          <div className="max-w-7xl mx-auto px-4">
+            <h1 className="text-2xl font-bold text-center">Wallet</h1>
           </div>
         </div>
 
@@ -57,14 +57,14 @@ export default function WalletPage() {
                     {formatCurrency(totalBalance)}
                   </p>
                 </div>
-                <div className="bg-purple-100 text-purple-700 p-3 rounded-full">💰</div>
+                <div className="bg-[#6E32B9] text-purple-700 p-3 rounded-full">💰</div>
               </div>
               <div className="bg-white p-6 rounded-lg border shadow-sm flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm">Total User</p>
                   <p className="text-2xl font-semibold text-purple-700">{users.length}</p>
                 </div>
-                <div className="bg-purple-100 text-purple-700 p-3 rounded-full">👥</div>
+                <div className="bg-[#6E32B9] text-purple-700 p-3 rounded-full">👥</div>
               </div>
             </div>
 
@@ -79,7 +79,7 @@ export default function WalletPage() {
               />
               <button
                 onClick={() => setModalType('create')}
-                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
+                className="bg-[#6E32B9] text-white px-4 py-2 rounded hover:bg-[#6E32B9] transition"
               >
                 + Tambah User
               </button>

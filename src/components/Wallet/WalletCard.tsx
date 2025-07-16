@@ -73,13 +73,13 @@ export default function WalletCard({ users, selectedUser, onSelectUser, isLoadin
                     onClick={() => onSelectUser(user)}
                     className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                       selectedUser?.id === user.id
-                        ? 'border-purple-600 bg-purple-50'
+                        ? 'border-purple-600 bg-[#6E32B9]'
                         : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-[#6E32B9] rounded-full flex items-center justify-center">
                           <UserIcon className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
@@ -103,7 +103,7 @@ export default function WalletCard({ users, selectedUser, onSelectUser, isLoadin
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setShowTopupModal(true)}
-                className="bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                className="bg-[#6E32B9] text-white py-3 rounded-lg hover:bg-[#6E32B9] transition-colors font-medium"
               >
                 Top Up
               </button>

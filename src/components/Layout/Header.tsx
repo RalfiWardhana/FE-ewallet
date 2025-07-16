@@ -11,7 +11,7 @@ export default function Header() {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#6E32B9] rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-lg">C</span>
             </div>
             <span className="text-xl font-semibold text-gray-900">CashEase</span>

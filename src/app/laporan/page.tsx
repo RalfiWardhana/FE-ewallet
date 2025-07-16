@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import { userApi, transactionApi } from '@/lib/api';
-import { formatCurrency, formatDate, formatDateTime } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/lib/utils';
 
 type TabType = 'saldo' | 'topup' | 'transfer';
 
@@ -15,26 +15,16 @@ export default function LaporanPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
 
-  const { data: users = [] } = useQuery({
-    queryKey: ['users'],
+
+const { data: balanceHistory = [], refetch: refetchBalance } = useQuery({
+  queryKey: ['users'],
     queryFn: async () => {
       const response = await userApi.getAll();
       return response.data;
     },
-  });
+  enabled: activeTab === 'saldo',
+});
 
-  const { data: balanceHistory = [], refetch: refetchBalance } = useQuery({
-    queryKey: ['balanceHistory', selectedUserId, selectedDate],
-    queryFn: async () => {
-      if (!selectedUserId) return [];
-      const response = await transactionApi.getBalanceHistory(
-        Number(selectedUserId),
-        selectedDate || undefined
-      );
-      return response.data;
-    },
-    enabled: activeTab === 'saldo' && !!selectedUserId,
-  });
 
   const { data: topupHistory = [], refetch: refetchTopup } = useQuery({
     queryKey: ['topupHistory', selectedUserId],
@@ -65,209 +55,132 @@ export default function LaporanPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      
+
       <main className="flex-1">
         {/* Purple Header */}
-        <div className="bg-purple-700 text-white py-12">
-          <div className="container mx-auto px-6">
-            <h1 className="text-3xl font-bold text-center">Laporan</h1>
+        <div className="bg-[#6E32B9] text-white py-10">
+          <div className="max-w-7xl mx-auto px-4">
+            <h1 className="text-2xl font-bold text-center">Laporan</h1>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="container mx-auto px-6 py-8">
-          <div className="bg-white rounded-lg shadow-lg">
-            {/* Tabs */}
-            <div className="border-b border-gray-200">
-              <div className="flex">
-                <button
-                  onClick={() => setActiveTab('saldo')}
-                  className={`px-8 py-4 font-medium text-sm transition-all ${
-                    activeTab === 'saldo'
-                      ? 'text-purple-600 border-b-2 border-purple-600'
-                      : 'text-gray-500 hover:text-gray-700'
+        <div className="max-w-7xl mx-auto px-4 mt-4 pb-16">
+          {/* Tabs */}
+          <div className="flex mb-2 gap-0.5">
+            {(['saldo', 'topup', 'transfer'] as TabType[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`w-32 text-sm font-semibold px-6 py-2 ${activeTab === tab
+                  ? 'bg-[#7322C4] text-white'
+                  : 'bg-[#F3E7FF] text-[#7322C4]'
+                  } ${tab === 'saldo' ? 'rounded-l-xl' : tab === 'transfer' ? 'rounded-r-xl' : ''
                   }`}
-                >
-                  Saldo
+              >
+                {tab === 'saldo' ? 'Saldo' : tab === 'topup' ? 'Top Up' : 'Transfer'}
+              </button>
+            ))}
+          </div>
+
+          {/* Search + Table Box */}
+          <div className="bg-white shadow-sm border border-[#F3E7FF] rounded-xl overflow-hidden">
+            {/* Search */}
+            <div className="p-4 border-b border-[#F3E7FF]">
+              <p className="text-xs text-[#5E5E5E] mb-2 font-medium">Pencarian</p>
+              <div className="flex items-center gap-3">
+                <div className="relative w-full">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9B9B9B] text-sm">
+                    <Search className="w-4 h-4" />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Cari"
+                    className="w-full pl-9 pr-4 py-2.5 text-sm text-[#3D3D3D] placeholder-[#9B9B9B] border border-[#C9AFFF] rounded-lg focus:outline-none"
+                  />
+                </div>
+                <button className="flex items-center gap-2 bg-[#7322C4] text-white text-sm font-medium px-4 py-2.5 rounded-lg">
+                   Tanggal
                 </button>
-                <button
-                  onClick={() => setActiveTab('topup')}
-                  className={`px-8 py-4 font-medium text-sm transition-all ${
-                    activeTab === 'topup'
-                      ? 'text-purple-600 border-b-2 border-purple-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Top Up
-                </button>
-                <button
-                  onClick={() => setActiveTab('transfer')}
-                  className={`px-8 py-4 font-medium text-sm transition-all ${
-                    activeTab === 'transfer'
-                      ? 'text-purple-600 border-b-2 border-purple-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Transfer
-                </button>
+
               </div>
             </div>
 
-            {/* Filters */}
-            <div className="p-6 bg-gray-50 border-b border-gray-200">
-              <div className="flex gap-4 items-end">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pengguna
-                  </label>
-                  <select
-                    value={selectedUserId}
-                    onChange={(e) => setSelectedUserId(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  >
-                    <option value="">Cari</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.full_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
+            {/* Table */}
+            <div>
+              <table className="w-full text-sm">
+                {/* Table Head */}
                 {activeTab === 'saldo' && (
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tanggal
-                    </label>
-                    <input
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  </div>
+                  <thead className="bg-[#F9FAFB] text-left text-[#667085]">
+                    <tr>
+                      <th className="px-4 py-3 font-semibold">Nama</th>
+                      <th className="px-4 py-3 font-semibold">Tanggal</th>
+                      <th className="px-4 py-3 font-semibold">Bank</th>
+                      <th className="px-4 py-3 font-semibold">Saldo</th>
+                    </tr>
+                  </thead>
+                )}
+                {activeTab === 'topup' && (
+                  <thead className="bg-[#F9FAFB] text-left text-[#667085]">
+                    <tr>
+                      <th className="px-4 py-3 font-semibold">Nama</th>
+                      <th className="px-4 py-3 font-semibold">Tanggal</th>
+                      <th className="px-4 py-3 font-semibold">Nominal</th>
+                    </tr>
+                  </thead>
+                )}
+                {activeTab === 'transfer' && (
+                  <thead className="bg-[#F9FAFB] text-left text-[#667085]">
+                    <tr>
+                      <th className="px-4 py-3 font-semibold">Nama Pengirim</th>
+                      <th className="px-4 py-3 font-semibold">Nama Penerima</th>
+                      <th className="px-4 py-3 font-semibold">Tanggal</th>
+                    </tr>
+                  </thead>
                 )}
 
-                <button 
-                  onClick={handleSearch}
-                  className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center gap-2"
-                >
-                  <Search className="w-4 h-4" />
-                  Tampil
-                </button>
-              </div>
-            </div>
-
-            {/* Table Content */}
-            <div className="overflow-x-auto">
-              {activeTab === 'saldo' && (
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Nama</th>
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Tanggal</th>
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Bank</th>
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Saldo</th>
+                {/* Table Body */}
+                <tbody>
+                  {activeTab === 'saldo' && users.map((item, idx) => (
+                    <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}>
+                      <td className="px-4 py-3 text-[#101828]">
+                        {item?.full_name || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-[#101828]">{formatDate(item.created_at)}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={`/bank-icons/${item.bank_code}.png`}
+                            alt={item.bank_code}
+                            className="w-6 h-6"
+                          />
+                          <span className="text-[#101828]">{item.bank_name}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-[#101828]">
+                        {formatCurrency(item?.balance)}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {balanceHistory.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className="text-center py-12 text-gray-500">
-                          {selectedUserId ? 'Tidak ada data' : 'Pilih user terlebih dahulu'}
-                        </td>
-                      </tr>
-                    ) : (
-                      balanceHistory.map((item, index) => (
-                        <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="py-4 px-6">
-                            {item.to_user?.full_name || item.from_user?.full_name || '-'}
-                          </td>
-                          <td className="py-4 px-6">{formatDate(item.created_at)}</td>
-                          <td className="py-4 px-6">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium ${
-                              item.type === 'TOPUP' 
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-blue-100 text-blue-800'
-                            }`}>
-                              {item.type === 'TOPUP' ? 'BCA/BNI' : 'TRANSFER'}
-                            </span>
-                          </td>
-                          <td className="py-4 px-6 font-medium">
-                            {formatCurrency(Number(item.balance_after))}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              )}
+                  ))}
 
-              {activeTab === 'topup' && (
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Nama</th>
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Tanggal</th>
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Nominal</th>
+                  {activeTab === 'topup' && topupHistory.map((item, idx) => (
+                    <tr key={item.id} className={idx % 2 ? 'bg-[#FAFAFA]' : 'bg-white'}>
+                      <td className="px-4 py-3 text-[#101828]">{item.user?.full_name || '-'}</td>
+                      <td className="px-4 py-3 text-[#101828]">{formatDate(item.created_at)}</td>
+                      <td className="px-4 py-3 text-[#101828]">{formatCurrency(item.amount)}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {topupHistory.length === 0 ? (
-                      <tr>
-                        <td colSpan={3} className="text-center py-12 text-gray-500">
-                          Tidak ada data topup
-                        </td>
-                      </tr>
-                    ) : (
-                      topupHistory.map((item, index) => (
-                        <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="py-4 px-6">{item.user.full_name}</td>
-                          <td className="py-4 px-6">{formatDateTime(item.created_at)}</td>
-                          <td className="py-4 px-6 font-medium text-green-600">
-                            +{formatCurrency(Number(item.amount))}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              )}
+                  ))}
 
-              {activeTab === 'transfer' && (
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Nama Pengirim</th>
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Nama Penerima</th>
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Tanggal</th>
-                      <th className="text-left py-4 px-6 font-medium text-gray-700">Nominal</th>
+                  {activeTab === 'transfer' && transferHistory.map((item, idx) => (
+                    <tr key={item.id} className={idx % 2 ? 'bg-[#FAFAFA]' : 'bg-white'}>
+                      <td className="px-4 py-3 text-[#101828]">{item.from_user?.full_name || '-'}</td>
+                      <td className="px-4 py-3 text-[#101828]">{item.to_user?.full_name || '-'}</td>
+                      <td className="px-4 py-3 text-[#101828]">{formatDate(item.created_at)}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {transferHistory.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className="text-center py-12 text-gray-500">
-                          Tidak ada data transfer
-                        </td>
-                      </tr>
-                    ) : (
-                      transferHistory.map((item, index) => (
-                        <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          <td className="py-4 px-6">{item.from_user.full_name}</td>
-                          <td className="py-4 px-6">{item.to_user.full_name}</td>
-                          <td className="py-4 px-6">{formatDateTime(item.created_at)}</td>
-                          <td className="py-4 px-6 font-medium">
-                            {formatCurrency(Number(item.amount))}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              )}
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

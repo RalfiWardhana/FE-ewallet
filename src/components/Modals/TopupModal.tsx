@@ -85,14 +85,14 @@ export default function TopupModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 py-3 border border-purple-600 text-purple-600 rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors"
+            className="flex-1 py-3 border border-purple-600 text-purple-600 rounded-xl text-sm font-semibold hover:bg-[#6E32B9] transition-colors"
           >
             Batal
           </button>
           <button
             type="submit"
             disabled={topupMutation.isPending || !selectedUser}
-            className="flex-1 py-3 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700 disabled:opacity-50"
+            className="flex-1 py-3 bg-[#6E32B9] text-white rounded-xl text-sm font-semibold hover:bg-[#6E32B9] disabled:opacity-50"
           >
             {topupMutation.isPending ? 'Loading...' : 'Top Up'}
           </button>
