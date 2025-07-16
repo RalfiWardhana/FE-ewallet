@@ -1,9 +1,8 @@
-// src/app/laporan/page.tsx
 'use client';
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Calendar, ChevronDown } from 'lucide-react';
+import { Search, Calendar, ChevronDown, X } from 'lucide-react';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import { userApi, transactionApi } from '@/lib/api';
@@ -16,7 +15,7 @@ export default function LaporanPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDateModal, setShowDateModal] = useState(false);
   const [dateFilter, setDateFilter] = useState({
     startDate: '',
     endDate: '',
@@ -118,7 +117,6 @@ export default function LaporanPage() {
     }
 
     setDateFilter({ startDate, endDate, selectedOption: option });
-    setShowDatePicker(false);
   };
 
   // Filter data based on search term
@@ -184,84 +182,24 @@ export default function LaporanPage() {
                   />
                 </div>
                 
-                <div className="relative">
-                  <button 
-                    onClick={() => setShowDatePicker(!showDatePicker)}
-                    className="flex items-center gap-2 bg-[#7322C4] text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-[#6320A7]"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Tanggal
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-                  
-                  {showDatePicker && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                      <button
-                        onClick={() => handleDateFilter('all')}
-                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                          dateFilter.selectedOption === 'all' ? 'bg-purple-50 text-purple-700' : ''
-                        }`}
-                      >
-                        Semua Tanggal
-                      </button>
-                      <button
-                        onClick={() => handleDateFilter('today')}
-                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                          dateFilter.selectedOption === 'today' ? 'bg-purple-50 text-purple-700' : ''
-                        }`}
-                      >
-                        Hari Ini
-                      </button>
-                      <button
-                        onClick={() => handleDateFilter('yesterday')}
-                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                          dateFilter.selectedOption === 'yesterday' ? 'bg-purple-50 text-purple-700' : ''
-                        }`}
-                      >
-                        Kemarin
-                      </button>
-                      <button
-                        onClick={() => handleDateFilter('week')}
-                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                          dateFilter.selectedOption === 'week' ? 'bg-purple-50 text-purple-700' : ''
-                        }`}
-                      >
-                        7 Hari Terakhir
-                      </button>
-                      <button
-                        onClick={() => handleDateFilter('month')}
-                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                          dateFilter.selectedOption === 'month' ? 'bg-purple-50 text-purple-700' : ''
-                        }`}
-                      >
-                        30 Hari Terakhir
-                      </button>
-                      <div className="border-t p-3">
-                        <label className="text-xs text-gray-600">Custom Range</label>
-                        <input
-                          type="date"
-                          value={dateFilter.startDate}
-                          max={today}
-                          onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value, selectedOption: 'custom' })}
-                          className="w-full mt-1 px-2 py-1 text-sm border rounded"
-                        />
-                        <input
-                          type="date"
-                          value={dateFilter.endDate}
-                          max={today}
-                          onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value, selectedOption: 'custom' })}
-                          className="w-full mt-1 px-2 py-1 text-sm border rounded"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <button 
+                  onClick={() => setShowDateModal(true)}
+                  className="flex items-center gap-2 bg-[#7322C4] text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-[#6320A7]"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Tanggal
+                  <ChevronDown className="w-4 h-4" />
+                </button>
               </div>
 
               {dateFilter.selectedOption !== 'all' && (
                 <p className="text-xs text-gray-500 mt-2">
                   Filter: {dateFilter.selectedOption === 'custom' 
                     ? `${dateFilter.startDate || 'Start'} - ${dateFilter.endDate || 'End'}`
+                    : dateFilter.selectedOption === 'today' ? 'Hari Ini'
+                    : dateFilter.selectedOption === 'yesterday' ? 'Kemarin'
+                    : dateFilter.selectedOption === 'week' ? '7 Hari Terakhir'
+                    : dateFilter.selectedOption === 'month' ? '30 Hari Terakhir'
                     : dateFilter.selectedOption
                   }
                 </p>
@@ -352,6 +290,126 @@ export default function LaporanPage() {
       </main>
 
       <Footer />
+
+      {/* Date Filter Modal */}
+      {showDateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl w-full max-w-sm shadow-xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Filter Tanggal</h3>
+              <button 
+                onClick={() => setShowDateModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-4">
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    handleDateFilter('all');
+                    setShowDateModal(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 rounded-lg text-sm hover:bg-gray-100 ${
+                    dateFilter.selectedOption === 'all' ? 'bg-purple-50 text-purple-700 font-medium' : ''
+                  }`}
+                >
+                  Semua Tanggal
+                </button>
+                <button
+                  onClick={() => {
+                    handleDateFilter('today');
+                    setShowDateModal(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 rounded-lg text-sm hover:bg-gray-100 ${
+                    dateFilter.selectedOption === 'today' ? 'bg-purple-50 text-purple-700 font-medium' : ''
+                  }`}
+                >
+                  Hari Ini
+                </button>
+                <button
+                  onClick={() => {
+                    handleDateFilter('yesterday');
+                    setShowDateModal(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 rounded-lg text-sm hover:bg-gray-100 ${
+                    dateFilter.selectedOption === 'yesterday' ? 'bg-purple-50 text-purple-700 font-medium' : ''
+                  }`}
+                >
+                  Kemarin
+                </button>
+                <button
+                  onClick={() => {
+                    handleDateFilter('week');
+                    setShowDateModal(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 rounded-lg text-sm hover:bg-gray-100 ${
+                    dateFilter.selectedOption === 'week' ? 'bg-purple-50 text-purple-700 font-medium' : ''
+                  }`}
+                >
+                  7 Hari Terakhir
+                </button>
+                <button
+                  onClick={() => {
+                    handleDateFilter('month');
+                    setShowDateModal(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 rounded-lg text-sm hover:bg-gray-100 ${
+                    dateFilter.selectedOption === 'month' ? 'bg-purple-50 text-purple-700 font-medium' : ''
+                  }`}
+                >
+                  30 Hari Terakhir
+                </button>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Custom Range</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs text-gray-600">Dari Tanggal</label>
+                    <input
+                      type="date"
+                      value={dateFilter.startDate}
+                      max={today}
+                      onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value, selectedOption: 'custom' })}
+                      className="w-full mt-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600">Sampai Tanggal</label>
+                    <input
+                      type="date"
+                      value={dateFilter.endDate}
+                      max={today}
+                      onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value, selectedOption: 'custom' })}
+                      className="w-full mt-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-4 flex gap-2">
+                  <button
+                    onClick={() => setShowDateModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowDateModal(false);
+                    }}
+                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700"
+                  >
+                    Terapkan
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

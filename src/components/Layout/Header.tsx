@@ -20,19 +20,29 @@ export default function Header() {
           <nav className="flex items-center space-x-8">
             <Link 
               href="/" 
-              className={`font-medium transition-colors ${
-                pathname === '/' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+              className={`relative font-medium transition-colors pb-1 ${
+                pathname === '/' 
+                  ? 'text-gray-900' 
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Wallet
+              {pathname === '/' && (
+                <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-[#6E32B9]"></span>
+              )}
             </Link>
             <Link 
               href="/laporan" 
-              className={`font-medium transition-colors ${
-                pathname === '/laporan' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+              className={`relative font-medium transition-colors pb-1 ${
+                pathname === '/laporan' 
+                  ? 'text-gray-900' 
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Laporan
+              {pathname === '/laporan' && (
+                <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-[#6E32B9]"></span>
+              )}
             </Link>
           </nav>
         </div>
